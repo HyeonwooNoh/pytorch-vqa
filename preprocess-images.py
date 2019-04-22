@@ -3,7 +3,6 @@ from torch.autograd import Variable
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
 import torch.utils.data
-import torchvision.models as models
 from tqdm import tqdm
 
 import config
@@ -60,8 +59,9 @@ def main():
 
         i = j = 0
         for ids, imgs in tqdm(loader):
-            imgs = Variable(imgs.cuda(async=True), volatile=True)
-            out = net(imgs)
+            with torch.no_grad():
+                imgs = Variable(imgs.cuda(async=True))
+                out = net(imgs)
 
             j = i + imgs.size(0)
             features[i:j, :, :] = out.data.cpu().numpy().astype('float16')
